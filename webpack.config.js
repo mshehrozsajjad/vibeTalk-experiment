@@ -1,4 +1,5 @@
 const path = require("path");
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: "./src/renderer/index.js",
@@ -6,6 +7,16 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "out"),
   },
+  experiments: {
+    topLevelAwait: true,
+  },
+  externals: [
+    nodeExternals({
+      modulesDir: path.join(__dirname, 'node_modules'),
+      importType: 'commonjs',
+      allowlist: ['svelte', /^svelte\//],
+    }),
+  ],
   module: {
     rules: [
       {
@@ -24,11 +35,16 @@ module.exports = {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        }
+      }
     ],
   },
   resolve: {
     alias: {
-      // thanks to https://cprimozic.net/notes/posts/fixing-cant-resolve-svelte-internal-disclose-version-error/
       svelte: path.resolve("node_modules", "svelte/src/runtime"),
     },
     extensions: [".mjs", ".js", ".svelte"],
